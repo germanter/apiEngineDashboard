@@ -1,4 +1,454 @@
-body{
-    font-family: Verdana, Arial, sans-serif;
-    font-size: 2em;
+/* --- CONFIGURABLE VARIABLES --- */
+:root {
+    --bg-color: #FFFFFF;
+    --border-color: #1971C2;
+    --primary-color: #1971C2;
+    --primary-hover: #135694;
+    --primary-light: #E7F1FB;
+    --text-color: #252423;
+    --text-secondary: #605E5C;
+    --card-bg: #FFFFFF;
+    --card-shadow: 0 4px 10px rgba(25, 113, 194, 0.06);
+    --border-light: #E1DFDD;
+    --radius: 6px;
+    
+    /* Status & Cost Colors */
+    --alive-color: #1971C2;
+    --dead-color: #E03131;
+    --unknown-color: #F08C00;
+    --free-color: #2F9E44;
+}
+
+/* Reset and Core Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 10px 15px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Header Styles */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 6px;
+}
+
+.dashboard-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.header-subtitle {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Action Button */
+.action-btn {
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Metrics Grid (Yığımcam və oxunaqlı ölçü) */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    box-shadow: var(--card-shadow);
+}
+
+.metric-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.metric-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-top: 2px;
+    text-transform: capitalize;
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 15px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Gauge ölçüsü üçün özəl böyük hündürlük */
+.gauge-body {
+    min-height: 145px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cost ölçüsü üçün standart yığcam hündürlük */
+.cost-body {
+    min-height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-element {
+    width: 100%;
+}
+
+/* Filter Buttons inside charts */
+.filter-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.filter-btn {
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    transition: all 0.15s;
+    text-transform: capitalize;
+}
+
+.filter-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+
+.filter-btn.active {
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+    border-color: var(--primary-color);
+}
+
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Bottom Grid Layout */
+.bottom-layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 15px;
+    align-items: stretch;
+}
+
+@media (max-width: 900px) {
+    .bottom-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bottom-card {
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bottom-card .chart-header,
+.bottom-card .table-card-header {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+/* İncə sürüşdürmə paneli */
+.scrollable-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.scrollable-content::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+.scrollable-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) transparent;
+}
+
+/* Kateqoriyalar üçün Üfüqi Proqres Barları */
+.category-bars-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-bar-wrapper {
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+    background-color: #FFFFFF;
+    transition: all 0.15s ease;
+}
+
+.category-bar-wrapper:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+
+.category-bar-wrapper.active {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+.category-bar-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.category-bar-bg {
+    background-color: #F1F3F5;
+    height: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+}
+
+.category-bar-fill {
+    background-color: var(--primary-color);
+    height: 100%;
+    transition: width 0.25s ease;
+}
+
+.category-bar-wrapper.active .category-bar-fill {
+    background-color: var(--primary-hover);
+}
+
+/* Cədvəl kart başlıq tənzimləmələri */
+.table-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.table-responsive {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+}
+
+/* Müasir Yığcam Cədvəl */
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 11px;
+}
+
+.modern-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    padding: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modern-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-color);
+    vertical-align: middle;
+}
+
+.modern-table tr:hover {
+    background-color: var(--primary-light);
+}
+
+/* Dots inside Table */
+.dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 3px;
+}
+
+.dot.green {
+    background-color: var(--free-color);
+}
+
+.dot.red {
+    background-color: var(--dead-color);
+}
+
+.dot.yellow {
+    background-color: var(--unknown-color);
+}
+
+/* Links & Buttons inside Table */
+.url-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.url-link:hover {
+    text-decoration: underline;
+}
+
+.copy-btn {
+    background-color: #FFFFFF;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.copy-btn:hover {
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+}
+
+.btn-svg-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+
+
+.header-left h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+}
+
+
+.header-icon {
+    width: 22px; 
+    height: 22px;
+    object-fit: contain;
+}
+
+
+.github-link {
+    color: var(--primary-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease, transform 0.15s ease;
+    text-decoration: none;
+}
+
+.github-link:hover {
+    color: var(--primary-hover);
+    transform: scale(1.08); 
+}
+
+.github-link svg {
+    display: block;
+    width: 24px;
+    height: 24px;
 }

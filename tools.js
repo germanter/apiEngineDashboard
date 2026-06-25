@@ -134,7 +134,7 @@ export function miniMax(counterObj, mode = "max") {
 export function dataMapper(entry, lang="aze"){
     try{
     if (entry === undefined || entry === null || entry === "") {
-            return { status: false }}
+            return { status: false, content:entry }}
 
     const mapper = {
         "aze" : 
@@ -175,3 +175,60 @@ export function dataMapper(entry, lang="aze"){
     }
 }
 
+
+/////////////////////// exc
+export function getBestCategory(rawData) {
+    try {
+        if (!Array.isArray(rawData) || rawData.length === 0) {
+            return { status: false };
+        }
+
+        const catGroup = counter(rawData, "category");
+        if (!catGroup.status) return { status: false };
+        
+        const categories = Object.keys(catGroup.content);
+        
+        let bestCategoryName = "NONE";
+        let highestScore = -1;
+
+        for (const cat of categories) {
+            const catItemsResult = filterData(rawData, { "category": cat });
+            if (!catItemsResult.status) continue;
+            
+            const catItems = catItemsResult.content;
+            const totalInCat = catItems.length;
+            
+            if (totalInCat === 0) continue;
+
+            const aliveItems = catItems.filter(item => item && item.status === "ALIVE").length;
+            const aliveRatio = aliveItems / totalInCat; 
+            const aliveComponent = aliveRatio * 50; // Max 50 bal
+
+            let costPoints = 0;
+            catItems.forEach(item => {
+                if (!item) return;
+                if (item.cost === "free")     costPoints += 1.0;
+                if (item.cost === "freemium") costPoints += 0.5;
+                if (item.cost === "premium")  costPoints += 0.1;
+            });
+            
+            const costRatio = costPoints / totalInCat; 
+            const costComponent = costRatio * 50; // Max 50 bal
+            const finalScore = aliveComponent + costComponent;
+
+            if (finalScore > highestScore) {
+                highestScore = finalScore;
+                bestCategoryName = cat;
+            }
+        }
+
+        return { 
+            status: true, 
+            content: bestCategoryName 
+        };
+
+    } catch (error) {
+        console.error("getBestCategory function failed, roger");
+        return { status: false };
+    }
+}
